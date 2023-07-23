@@ -1,11 +1,12 @@
 import React, { useRef, useEffect, useState } from "react";
 
 const Canvas = ({
-  penColor = "#000000",
+  penColor = "rgb(0, 0, 0)",
   penSize = 10,
-  smoothingFactor,
+  smoothingFactor = 0.85,
   canvasWidth = 800,
   canvasHeight = 600,
+  mode = "draw",
 }) => {
   const canvasRef = useRef(null);
   const [drawing, setDrawing] = useState(false);
@@ -15,7 +16,6 @@ const Canvas = ({
     previous: { x: 0, y: 0 },
   });
 
-  // Initialize the canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
@@ -29,13 +29,11 @@ const Canvas = ({
     setDrawing(false);
   };
 
-  // Handle mouse events
   const handleMouseDown = (e) => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
 
@@ -49,26 +47,19 @@ const Canvas = ({
 
   const handleMouseMove = (e) => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
-
-    if (!drawing) return;
-
-    ctx.strokeStyle = penColor;
-    ctx.lineWidth = penSize;
-
     const x = (e.clientX - rect.left) * scaleX;
     const y = (e.clientY - rect.top) * scaleY;
 
-    // Update actual position
+    if (!drawing) return;
+
     setPosition((pos) => ({ ...pos, actual: { x, y } }));
   };
 
   useEffect(() => {
     if (drawing) {
-      // Use the smoothingFactor prop here
       setPosition((pos) => {
         const smoothedX =
           pos.smoothed.x * smoothingFactor +
@@ -76,6 +67,7 @@ const Canvas = ({
         const smoothedY =
           pos.smoothed.y * smoothingFactor +
           pos.actual.y * (1 - smoothingFactor);
+
         return {
           actual: pos.actual,
           smoothed: { x: smoothedX, y: smoothedY },
@@ -83,17 +75,25 @@ const Canvas = ({
         };
       });
     }
-  }, [drawing, position.actual, smoothingFactor]);
+  }, [drawing, position.actual]);
 
   useEffect(() => {
+    if (!drawing) return;
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
+    ctx.lineWidth = penSize;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.strokeStyle = mode === "draw" ? penColor : "rgba(0,0,0,1)";
+    ctx.globalCompositeOperation =
+      mode === "draw" ? "source-over" : "destination-out";
+
     const midX = (position.smoothed.x + position.previous.x) / 2;
     const midY = (position.smoothed.y + position.previous.y) / 2;
-
     ctx.quadraticCurveTo(position.previous.x, position.previous.y, midX, midY);
     ctx.stroke();
-  }, [drawing, position.smoothed]);
+  }, [drawing, position.smoothed, penSize, mode, penColor]);
 
   return (
     <canvas
@@ -103,11 +103,7 @@ const Canvas = ({
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
-      style={{
-        maxWidth: "100%",
-        maxHeight: "100%",
-        objectFit: "contain",
-      }}
+      style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
     />
   );
 };

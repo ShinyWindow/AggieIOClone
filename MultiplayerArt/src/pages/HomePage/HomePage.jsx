@@ -5,8 +5,9 @@ import ArtSettingsBar from "../../components/ArtSettingsBar";
 import { useEffect, useState } from "react";
 
 const HomePage = () => {
-  const [color, setColor] = useState("#fff");
+  const [color, setColor] = useState({ r: 0, g: 0, b: 0, a: 1 });
   const [size, setSize] = useState("#fff");
+  const [mode, setMode] = useState("draw");
 
   return (
     <div className="bg-gray-400 w-full h-full">
@@ -15,11 +16,12 @@ const HomePage = () => {
         <ArtToolbar />
         <div>
           <Canvas
-            penColor={color}
+            penColor={`rgba(${color.r},${color.g},${color.b},${color.a})`}
             penSize={size}
-            smoothingFactor={0.5}
+            smoothingFactor={0.9}
             width={1200}
             height={800}
+            mode={mode}
           />
         </div>
         <ArtSettingsBar
@@ -27,6 +29,8 @@ const HomePage = () => {
           setColor={setColor}
           size={size}
           setSize={setSize}
+          mode={mode}
+          setMode={setMode}
         />
       </div>
     </div>
