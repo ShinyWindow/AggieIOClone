@@ -18,7 +18,7 @@ const HomePage = () => {
           <Canvas
             penColor={`rgba(${color.r},${color.g},${color.b},${color.a})`}
             penSize={size}
-            smoothingFactor={0.9}
+            smoothingFactor={0.2}
             width={1200}
             height={800}
             mode={mode}

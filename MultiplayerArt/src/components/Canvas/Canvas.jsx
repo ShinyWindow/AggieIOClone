@@ -10,6 +10,8 @@ const Canvas = ({
 }) => {
   const canvasRef = useRef(null);
   const [drawing, setDrawing] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [undoHistory, setUndoHistory] = useState([]);
   const [position, setPosition] = useState({
     actual: { x: 0, y: 0 },
     smoothed: { x: 0, y: 0 },
@@ -25,8 +27,47 @@ const Canvas = ({
     context.lineWidth = penSize;
   }, [penColor, penSize]);
 
+  const saveToHistory = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    setHistory((prevHistory) => [...prevHistory, imageData]);
+    setUndoHistory([]);
+  };
+
+  const undo = () => {
+    console.log("undo");
+    if (history.length > 0) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+      const lastImage = history[history.length - 1];
+      setUndoHistory((prevUndoHistory) => [lastImage, ...prevUndoHistory]);
+      setHistory((prevHistory) => prevHistory.slice(0, -1));
+      if (history.length > 1) {
+        const nextLastImage = history[history.length - 2];
+        ctx.putImageData(nextLastImage, 0, 0);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+  };
+
+  const redo = () => {
+    console.log("redo");
+    if (undoHistory.length > 0) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+      const nextImage = undoHistory[0];
+      ctx.putImageData(nextImage, 0, 0);
+      setHistory((prevHistory) => [...prevHistory, nextImage]);
+      setUndoHistory((prevUndoHistory) => prevUndoHistory.slice(1));
+    }
+  };
+
   const handleMouseUp = () => {
     setDrawing(false);
+    // Save the current image data after a line is drawn
+    saveToHistory();
   };
 
   const handleMouseDown = (e) => {
@@ -96,15 +137,19 @@ const Canvas = ({
   }, [drawing, position.smoothed, penSize, mode, penColor]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={canvasWidth}
-      height={canvasHeight}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onMouseMove={handleMouseMove}
-      style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
-    />
+    <>
+      <canvas
+        ref={canvasRef}
+        width={canvasWidth}
+        height={canvasHeight}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
+      />
+      <button onClick={undo}>Undo</button>
+      <button onClick={redo}>Redo</button>
+    </>
   );
 };
 
