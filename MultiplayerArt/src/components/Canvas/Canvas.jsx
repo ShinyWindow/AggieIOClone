@@ -21,11 +21,9 @@ const Canvas = ({
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
-    context.lineJoin = "round";
-    context.lineCap = "round";
-    context.strokeStyle = penColor;
-    context.lineWidth = penSize;
-  }, [penColor, penSize]);
+    context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+  }, []);
 
   const saveToHistory = () => {
     const canvas = canvasRef.current;
