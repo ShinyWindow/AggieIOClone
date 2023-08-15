@@ -1,0 +1,3 @@
+.art-items-parent > *:not(:last-child) {
+  margin-right: 0.5rem; /* Equivalent to mr-2 in Tailwind */
+}

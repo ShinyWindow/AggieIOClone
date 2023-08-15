@@ -81,7 +81,7 @@ const DrawingApp = () => {
             transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
           }}
         >
-          <Canvas width={1200} height={800} />
+          <Canvas width={1920} height={1080} />
         </div>
       </div>
     </>

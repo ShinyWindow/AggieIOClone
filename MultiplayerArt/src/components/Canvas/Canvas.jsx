@@ -2,7 +2,16 @@ import React, { useRef, useEffect, useState, useContext } from "react";
 import DrawingContext from "../../context/DrawingContext";
 
 const Canvas = ({ canvasWidth = 800, canvasHeight = 600 }) => {
-  const { color, smoothingFactor, size, mode } = useContext(DrawingContext);
+  const {
+    color,
+    smoothingFactor,
+    size,
+    mode,
+    undo,
+    redo,
+    saveToHistory,
+    canvasRef,
+  } = useContext(DrawingContext);
   let [tempSmoothing, setTempSmoothing] = useState(
     smoothingFactor ? smoothingFactor * 0.01 : 0.2
   );
@@ -11,10 +20,7 @@ const Canvas = ({ canvasWidth = 800, canvasHeight = 600 }) => {
       ? `rgba(${color.r},${color.g},${color.b},${color.a})`
       : "rgba(0,0,0,1)"
   );
-  const canvasRef = useRef(null);
   const [drawing, setDrawing] = useState(false);
-  const [history, setHistory] = useState([]);
-  const [undoHistory, setUndoHistory] = useState([]);
   const [position, setPosition] = useState({
     actual: { x: 0, y: 0 },
     smoothed: { x: 0, y: 0 },
@@ -38,47 +44,13 @@ const Canvas = ({ canvasWidth = 800, canvasHeight = 600 }) => {
     context.fillRect(0, 0, canvas.width, canvas.height);
   }, []);
 
-  const saveToHistory = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    setHistory((prevHistory) => [...prevHistory, imageData]);
-    setUndoHistory([]);
-  };
-
-  const undo = () => {
-    console.log("undo");
-    if (history.length > 0) {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
-      const lastImage = history[history.length - 1];
-      setUndoHistory((prevUndoHistory) => [lastImage, ...prevUndoHistory]);
-      setHistory((prevHistory) => prevHistory.slice(0, -1));
-      if (history.length > 1) {
-        const nextLastImage = history[history.length - 2];
-        ctx.putImageData(nextLastImage, 0, 0);
-      } else {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-    }
-  };
-
-  const redo = () => {
-    console.log("redo");
-    if (undoHistory.length > 0) {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
-      const nextImage = undoHistory[0];
-      ctx.putImageData(nextImage, 0, 0);
-      setHistory((prevHistory) => [...prevHistory, nextImage]);
-      setUndoHistory((prevUndoHistory) => prevUndoHistory.slice(1));
-    }
-  };
-
   const handleMouseUp = () => {
     setDrawing(false);
     // Save the current image data after a line is drawn
-    saveToHistory();
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    saveToHistory(imageData); // Using the function from context now
   };
 
   const handleMouseDown = (e) => {
@@ -156,8 +128,6 @@ const Canvas = ({ canvasWidth = 800, canvasHeight = 600 }) => {
         onMouseMove={handleMouseMove}
         style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
       />
-      <button onClick={undo}>Undo</button>
-      <button onClick={redo}>Redo</button>
     </>
   );
 };
