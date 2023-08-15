@@ -4,14 +4,11 @@ import ArtHeader from "../../components/ArtHeader";
 import ArtToolbar from "../../components/ArtToolbar";
 import ArtSettingsBar from "../../components/ArtSettingsBar";
 
-const HomePage = () => {
-  const [color, setColor] = useState({ r: 0, g: 0, b: 0, a: 1 });
-  const [size, setSize] = useState("#fff");
-  const [mode, setMode] = useState("draw");
+const DrawingApp = () => {
   const [dragging, setDragging] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [scale, setScale] = useState(1);
-  const [spacePressed, setSpacePressed] = useState(false); // NEW: state to check if space key is pressed
+  const [spacePressed, setSpacePressed] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -70,14 +67,7 @@ const HomePage = () => {
         <ArtToolbar />
       </div>
       <div className="fixed right-0 h-full mt-10 z-10">
-        <ArtSettingsBar
-          color={color}
-          setColor={setColor}
-          size={size}
-          setSize={setSize}
-          mode={mode}
-          setMode={setMode}
-        />
+        <ArtSettingsBar />
       </div>
       <div
         className="bg-gray-400 w-full h-full"
@@ -91,18 +81,11 @@ const HomePage = () => {
             transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
           }}
         >
-          <Canvas
-            penColor={`rgba(${color.r},${color.g},${color.b},${color.a})`}
-            penSize={size}
-            smoothingFactor={0.2}
-            width={1200}
-            height={800}
-            mode={mode}
-          />
+          <Canvas width={1200} height={800} />
         </div>
       </div>
     </>
   );
 };
 
-export default HomePage;
+export default DrawingApp;

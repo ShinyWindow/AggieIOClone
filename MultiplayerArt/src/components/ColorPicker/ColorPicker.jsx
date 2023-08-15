@@ -1,8 +1,10 @@
-import { HexColorPicker, RgbaColorPicker } from "react-colorful";
+import { RgbaColorPicker } from "react-colorful";
+import DrawingContext from "../../context/DrawingContext";
+import { useContext } from "react";
 
-const ColorPicker = ({ color, setColor }) => {
+const ColorPicker = () => {
+  const { color, setColor } = useContext(DrawingContext);
   const handleChange = (color) => {
-    console.log(color);
     setColor(color);
   };
 

@@ -1,13 +1,16 @@
 import { lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
-import HomePage from "./pages/HomePage";
+import DrawingPage from "./pages/DrawingPage";
+import DrawingProvider from "./context/DrawingProvider";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-    </Routes>
+    <DrawingProvider>
+      <Routes>
+        <Route path="/" element={<DrawingPage />} />
+      </Routes>
+    </DrawingProvider>
   );
 }
 

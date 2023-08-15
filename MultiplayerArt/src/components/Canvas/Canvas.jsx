@@ -1,13 +1,16 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useContext } from "react";
+import DrawingContext from "../../context/DrawingContext";
 
-const Canvas = ({
-  penColor = "rgb(0, 0, 0)",
-  penSize = 10,
-  smoothingFactor = 0.85,
-  canvasWidth = 800,
-  canvasHeight = 600,
-  mode = "draw",
-}) => {
+const Canvas = ({ canvasWidth = 800, canvasHeight = 600 }) => {
+  const { color, smoothingFactor, size, mode } = useContext(DrawingContext);
+  let [tempSmoothing, setTempSmoothing] = useState(
+    smoothingFactor ? smoothingFactor * 0.01 : 0.2
+  );
+  const [penColor, setPenColor] = useState(
+    color
+      ? `rgba(${color.r},${color.g},${color.b},${color.a})`
+      : "rgba(0,0,0,1)"
+  );
   const canvasRef = useRef(null);
   const [drawing, setDrawing] = useState(false);
   const [history, setHistory] = useState([]);
@@ -17,6 +20,16 @@ const Canvas = ({
     smoothed: { x: 0, y: 0 },
     previous: { x: 0, y: 0 },
   });
+
+  useEffect(() => {
+    const newPenColor = `rgba(${color.r},${color.g},${color.b},${color.a})`;
+    setPenColor(newPenColor);
+  }, [color]);
+
+  useEffect(() => {
+    let newSmoothingFactor = smoothingFactor * 0.01;
+    setTempSmoothing(newSmoothingFactor);
+  }, [smoothingFactor]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -101,11 +114,9 @@ const Canvas = ({
     if (drawing) {
       setPosition((pos) => {
         const smoothedX =
-          pos.smoothed.x * smoothingFactor +
-          pos.actual.x * (1 - smoothingFactor);
+          pos.smoothed.x * tempSmoothing + pos.actual.x * (1 - tempSmoothing);
         const smoothedY =
-          pos.smoothed.y * smoothingFactor +
-          pos.actual.y * (1 - smoothingFactor);
+          pos.smoothed.y * tempSmoothing + pos.actual.y * (1 - tempSmoothing);
 
         return {
           actual: pos.actual,
@@ -121,7 +132,7 @@ const Canvas = ({
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-    ctx.lineWidth = penSize;
+    ctx.lineWidth = size;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
     ctx.strokeStyle = mode === "draw" ? penColor : "rgba(0,0,0,1)";
@@ -132,7 +143,7 @@ const Canvas = ({
     const midY = (position.smoothed.y + position.previous.y) / 2;
     ctx.quadraticCurveTo(position.previous.x, position.previous.y, midX, midY);
     ctx.stroke();
-  }, [drawing, position.smoothed, penSize, mode, penColor]);
+  }, [drawing, position.smoothed, size, mode, penColor]);
 
   return (
     <>
