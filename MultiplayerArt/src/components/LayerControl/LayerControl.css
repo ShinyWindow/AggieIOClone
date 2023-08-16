@@ -1,0 +1,15 @@
+.selected-grey {
+  background-color: rgb(127, 134, 146);
+}
+
+.selected-grey:hover {
+  background-color: rgb(130, 137, 149);
+}
+
+.layer-grey {
+  background-color: rgb(85, 96, 107);
+}
+
+.layer-grey:hover {
+  background-color: rgb(100, 112, 125);
+}

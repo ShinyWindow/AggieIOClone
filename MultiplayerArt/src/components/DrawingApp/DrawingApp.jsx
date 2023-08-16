@@ -63,10 +63,10 @@ const DrawingApp = () => {
       <div className="fixed top-0 w-full z-10">
         <ArtHeader />
       </div>
-      <div className="fixed left-0 h-full mt-10 z-10">
+      <div className="fixed left-0 h-without-header mt-10 z-10">
         <ArtToolbar />
       </div>
-      <div className="fixed right-0 h-full mt-10 z-10">
+      <div className="fixed right-0 h-without-header mt-10 z-10">
         <ArtSettingsBar />
       </div>
       <div
@@ -81,7 +81,7 @@ const DrawingApp = () => {
             transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
           }}
         >
-          <Canvas width={1920} height={1080} />
+          <Canvas width={1920} height={1080} spacePressed={spacePressed} />
         </div>
       </div>
     </>

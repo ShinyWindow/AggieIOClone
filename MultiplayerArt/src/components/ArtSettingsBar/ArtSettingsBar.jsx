@@ -5,11 +5,13 @@ import LayerControl from "../LayerControl";
 
 const ArtSettingsBar = () => {
   return (
-    <div className="bg-gray-600 text-white min-w-[264px] h-full">
-      <div className="h-64 overflow-hidden">
+    <div className="bg-gray-600 text-white min-w-[264px] flex flex-col h-full">
+      <div className="h-64 overflow-hidden flex-shrink-0">
         <ColorPicker />
       </div>
-      <LayerControl />
+      <div className="flex-grow overflow-hidden">
+        <LayerControl />
+      </div>
     </div>
   );
 };

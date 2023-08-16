@@ -1,0 +1,8 @@
+.h-without-header {
+  height: calc(100% - 2.5rem);
+}
+
+.hover-bg:hover {
+  background-color: rgb(64, 74, 93);
+  border-radius: 8px;
+}

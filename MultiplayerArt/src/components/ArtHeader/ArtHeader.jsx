@@ -39,7 +39,7 @@ const ArtHeader = () => {
         </button>
         <button
           onClick={toggleMode}
-          className={`w-6 h-6 ${mode === "erase" ? "bg-gray-700" : ""}`}
+          className={`w-6 h-6 ${mode === "erase" ? "bg-gray-700" : "hover-bg"}`}
           style={{
             padding: "3px",
             borderRadius: "5px",

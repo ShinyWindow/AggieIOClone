@@ -22,7 +22,7 @@ const DrawingProvider = ({ children }) => {
   const initialDrawableLayer = {
     canvasRef: useRef(null),
     visible: true,
-    id: "Layer 1",
+    id: "Layer #1",
     drawable: true,
   };
 

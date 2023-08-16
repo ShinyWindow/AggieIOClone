@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useContext } from "react";
 import DrawingContext from "../../context/DrawingContext";
 
-const Canvas = ({ canvasWidth = 800, canvasHeight = 600 }) => {
+const Canvas = ({ canvasWidth = 800, canvasHeight = 600, spacePressed }) => {
   const {
     color,
     smoothingFactor,
@@ -61,7 +61,12 @@ const Canvas = ({ canvasWidth = 800, canvasHeight = 600 }) => {
   };
 
   const handleMouseDown = (e) => {
-    if (!canvasRef.current || !layers[currentLayerIndex].drawable) return;
+    if (
+      spacePressed ||
+      !canvasRef.current ||
+      !layers[currentLayerIndex].drawable
+    )
+      return;
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
@@ -78,7 +83,7 @@ const Canvas = ({ canvasWidth = 800, canvasHeight = 600 }) => {
   };
 
   const handleMouseMove = (e) => {
-    if (!canvasRef.current) return;
+    if (spacePressed || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
