@@ -10,8 +10,12 @@ const Canvas = ({ canvasWidth = 800, canvasHeight = 600 }) => {
     undo,
     redo,
     saveToHistory,
-    canvasRef,
+    layers,
+    currentLayerIndex,
   } = useContext(DrawingContext);
+
+  const canvasRef = layers[currentLayerIndex]?.canvasRef || useRef(null);
+
   let [tempSmoothing, setTempSmoothing] = useState(
     smoothingFactor ? smoothingFactor * 0.01 : 0.2
   );
@@ -38,22 +42,26 @@ const Canvas = ({ canvasWidth = 800, canvasHeight = 600 }) => {
   }, [smoothingFactor]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const context = canvas.getContext("2d");
-    context.fillStyle = "white";
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    if (layers[0].id === "Background" && layers[0].canvasRef.current) {
+      const canvas = layers[0].canvasRef.current;
+      const context = canvas.getContext("2d");
+      context.fillStyle = "white";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+    }
   }, []);
 
   const handleMouseUp = () => {
+    if (!canvasRef.current) return;
+
     setDrawing(false);
-    // Save the current image data after a line is drawn
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    saveToHistory(imageData); // Using the function from context now
+    saveToHistory(imageData);
   };
 
   const handleMouseDown = (e) => {
+    if (!canvasRef.current || !layers[currentLayerIndex].drawable) return;
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
@@ -70,6 +78,7 @@ const Canvas = ({ canvasWidth = 800, canvasHeight = 600 }) => {
   };
 
   const handleMouseMove = (e) => {
+    if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
@@ -100,7 +109,7 @@ const Canvas = ({ canvasWidth = 800, canvasHeight = 600 }) => {
   }, [drawing, position.actual]);
 
   useEffect(() => {
-    if (!drawing) return;
+    if (!drawing || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -118,17 +127,42 @@ const Canvas = ({ canvasWidth = 800, canvasHeight = 600 }) => {
   }, [drawing, position.smoothed, size, mode, penColor]);
 
   return (
-    <>
-      <canvas
-        ref={canvasRef}
-        width={canvasWidth}
-        height={canvasHeight}
+    <div
+      style={{
+        position: "relative",
+        width: canvasWidth,
+        height: canvasHeight,
+      }}
+    >
+      {layers.map((layer, index) => (
+        <canvas
+          key={layer.id}
+          ref={layer.canvasRef}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            display: layer.visible ? "block" : "none",
+            zIndex: index,
+          }}
+          width={canvasWidth}
+          height={canvasHeight}
+        />
+      ))}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          zIndex: layers.length,
+        }}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
-        style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
       />
-    </>
+    </div>
   );
 };
 

@@ -12,6 +12,25 @@ const DrawingProvider = ({ children }) => {
   const [undoHistory, setUndoHistory] = useState([]);
   const canvasRef = useRef(null); // Keep a reference to the canvas
 
+  const initialBackgroundLayer = {
+    canvasRef: useRef(null),
+    visible: true,
+    id: "Background",
+    drawable: false,
+  };
+
+  const initialDrawableLayer = {
+    canvasRef: useRef(null),
+    visible: true,
+    id: "Layer 1",
+    drawable: true,
+  };
+
+  const [layers, setLayers] = useState([
+    initialBackgroundLayer,
+    initialDrawableLayer,
+  ]);
+  const [currentLayerIndex, setCurrentLayerIndex] = useState(1);
   const saveToHistory = (imageData) => {
     setHistory((prevHistory) => [...prevHistory, imageData]);
     setUndoHistory([]);
@@ -61,6 +80,10 @@ const DrawingProvider = ({ children }) => {
         redo,
         saveToHistory,
         canvasRef,
+        layers,
+        setLayers,
+        currentLayerIndex,
+        setCurrentLayerIndex,
       }}
     >
       {children}
